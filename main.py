@@ -1,19 +1,27 @@
-import os
-import pandas as pd
 from src.matrix_factorization import SVD
+from src.preprocessing import (
+    load_data,
+    prepare_train_set,
+    build_test_matrix,
+    build_train_matrix,
+)
+from src.utils import plot_losses
+
+import matplotlib.pyplot as plt
+
 
 if __name__ == "__main__":
-    column_names = ["user_id", "item_id", "rating", "timestamp"]
 
-    print(os.path.dirname(__file__))
-    df = pd.read_csv(
-        os.path.join(os.path.dirname(__file__), "data/ml-100k.data"),
-        sep="\t",
-        names=column_names,
-    ).drop(columns="timestamp")
+    df = load_data()
 
-    matrix = df.pivot(index="user_id", columns="item_id", values="rating").to_numpy()
+    df_train, df_test = prepare_train_set(df, train_size=0.9)
 
-    u, v = SVD().train(X=matrix)
+    train_matrix = build_train_matrix(df_train)
 
-    print(u.shape, v.shape)
+    test_matrix = build_test_matrix(df_test)
+
+    svd = SVD(epoch=10)
+    svd.train(train_matrix)
+    predicted = svd.predict(test_matrix[:, 0], test_matrix[:, 1])
+
+    plot_losses(svd.losses)
