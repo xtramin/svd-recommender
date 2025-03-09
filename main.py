@@ -7,8 +7,6 @@ from src.preprocessing import (
 )
 from src.utils import plot_losses
 
-import matplotlib.pyplot as plt
-
 
 if __name__ == "__main__":
 
